@@ -8,6 +8,7 @@ struct RepublisherNode {
     node: Arc<rclrs::Node>,
     _subscription: Arc<rclrs::Subscription<StringMsg>>,
     data: Arc<Mutex<Option<StringMsg>>>,
+    publisher: Arc<rclrs::Publisher<StringMsg>>,
 }
 
 impl RepublisherNode {
@@ -20,19 +21,39 @@ impl RepublisherNode {
             rclrs::QOS_PROFILE_DEFAULT,
             move |msg: StringMsg| {
                 *data_cb.lock().unwrap() = Some(msg);
-                dbg!("{:?}", &data_cb);
+                //dbg!("{:?}", &data_cb);
             },
         )?;
+
+        let publisher = node.create_publisher("out_topic", rclrs::QOS_PROFILE_DEFAULT)?;
         Ok(Self {
             node,
             _subscription,
+            publisher,
             data,
         })
+    }
+
+    fn republish(&self) -> Result<(), rclrs::RclrsError> {
+        if let Some(s) = &*self.data.lock().unwrap() {
+            self.publisher.publish(s)?;
+        }
+        Ok(())
     }
 }
 
 fn main() -> Result<(), rclrs::RclrsError> {
     let context = rclrs::Context::new(std::env::args())?;
-    let republisher = RepublisherNode::new(&context)?;
-    rclrs::spin(republisher.node)
+    let republisher = Arc::new(RepublisherNode::new(&context)?);
+    let republisher_other_thread = Arc::clone(&republisher);
+
+    std::thread::spawn(move || -> Result<(), rclrs::RclrsError> {
+        loop {
+            use std::time::Duration;
+            std::thread::sleep(Duration::from_millis(1000));
+            republisher_other_thread.republish()?;
+        }
+    });
+
+    rclrs::spin(Arc::clone(&republisher.node))
 }
