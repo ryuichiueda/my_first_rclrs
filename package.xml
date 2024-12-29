@@ -1,0 +1,14 @@
+<package format="3">
+  <name>my_first_rclrs</name>
+  <version>0.0.0</version>
+  <description>practice</description>
+  <maintainer email="ryuichiueda@gmail.com">Ryuichi Ueda</maintainer>
+  <license>Apache-2.0</license>
+
+  <depend>rclrs</depend>
+  <depend>std_msgs</depend>
+
+  <export>
+    <build_type>ament_cargo</build_type>
+  </export>
+</package>
