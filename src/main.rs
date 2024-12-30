@@ -1,14 +1,17 @@
 //SPDX-FileCopyrightText: ros2_rust contributers
+//SPDX-FileCopyrightText: Ryuichi Ueda <ryuichiueda@gmail.com>
 //SPDX-License-Identifier: Apache-2.0
 
 use std::sync::{Arc, Mutex};
-use std_msgs::msg::String as StringMsg;
+//use std_msgs::msg::String as LaserScan;
+use sensor_msgs::msg::LaserScan;
 
 struct RepublisherNode {
     node: Arc<rclrs::Node>,
-    _subscription: Arc<rclrs::Subscription<StringMsg>>,
-    data: Arc<Mutex<Option<StringMsg>>>,
-    publisher: Arc<rclrs::Publisher<StringMsg>>,
+    //_subscription: Arc<rclrs::Subscription<LaserScan>>,
+    _subscription: Arc<rclrs::Subscription<LaserScan>>,
+    data: Arc<Mutex<Option<LaserScan>>>,
+    publisher: Arc<rclrs::Publisher<LaserScan>>,
 }
 
 impl RepublisherNode {
@@ -17,12 +20,9 @@ impl RepublisherNode {
         let data = Arc::new(Mutex::new(None));
         let data_cb = Arc::clone(&data);
         let _subscription = node.create_subscription(
-            "in_topic",
+            "scan",
             rclrs::QOS_PROFILE_DEFAULT,
-            move |msg: StringMsg| {
-                *data_cb.lock().unwrap() = Some(msg);
-                //dbg!("{:?}", &data_cb);
-            },
+            move |msg: LaserScan| { *data_cb.lock().unwrap() = Some(msg); },
         )?;
 
         let publisher = node.create_publisher("out_topic", rclrs::QOS_PROFILE_DEFAULT)?;

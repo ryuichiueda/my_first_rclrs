@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 rclrs = "*"
 std_msgs = "*"
+sensor_msgs = "*"
