@@ -233,8 +233,20 @@ checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
 name = "my_first_rclrs"
 version = "0.1.0"
 dependencies = [
+ "builtin_interfaces",
+ "nav_msgs",
  "rclrs",
  "sensor_msgs",
+ "std_msgs",
+]
+
+[[package]]
+name = "nav_msgs"
+version = "4.2.4"
+dependencies = [
+ "builtin_interfaces",
+ "geometry_msgs",
+ "rosidl_runtime_rs",
  "std_msgs",
 ]
 
@@ -489,10 +501,6 @@ version = "0.4.1"
 [[patch.unused]]
 name = "lifecycle_msgs"
 version = "1.2.1"
-
-[[patch.unused]]
-name = "nav_msgs"
-version = "4.2.4"
 
 [[patch.unused]]
 name = "rcl_interfaces"
