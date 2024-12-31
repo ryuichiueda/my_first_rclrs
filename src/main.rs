@@ -3,12 +3,10 @@
 //SPDX-License-Identifier: Apache-2.0
 
 use std::sync::{Arc, Mutex};
-//use std_msgs::msg::String as LaserScan;
 use sensor_msgs::msg::LaserScan;
 
 struct RepublisherNode {
     node: Arc<rclrs::Node>,
-    //_subscription: Arc<rclrs::Subscription<LaserScan>>,
     _subscription: Arc<rclrs::Subscription<LaserScan>>,
     data: Arc<Mutex<Option<LaserScan>>>,
     publisher: Arc<rclrs::Publisher<LaserScan>>,
