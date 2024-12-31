@@ -19,10 +19,7 @@ impl RepublisherNode {
         let _subscription = node.create_subscription(
             "in_topic",
             rclrs::QOS_PROFILE_DEFAULT,
-            move |msg: StringMsg| {
-                *data_cb.lock().unwrap() = Some(msg);
-                //dbg!("{:?}", &data_cb);
-            },
+            move |msg: StringMsg| { *data_cb.lock().unwrap() = Some(msg); },
         )?;
 
         let publisher = node.create_publisher("out_topic", rclrs::QOS_PROFILE_DEFAULT)?;
