@@ -13,7 +13,6 @@ use geometry_msgs::msg::Pose;
 
 struct RepublisherNode {
     node: Arc<rclrs::Node>,
-    //_subscription: Arc<rclrs::Subscription<LaserScan>>,
     _subscription: Arc<rclrs::Subscription<LaserScan>>,
     data: Arc<Mutex<Option<LaserScan>>>,
     publisher: Arc<rclrs::Publisher<LaserScan>>,
