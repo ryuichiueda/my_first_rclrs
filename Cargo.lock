@@ -234,6 +234,7 @@ name = "my_first_rclrs"
 version = "0.1.0"
 dependencies = [
  "builtin_interfaces",
+ "geometry_msgs",
  "nav_msgs",
  "rclrs",
  "sensor_msgs",

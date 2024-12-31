@@ -5,9 +5,11 @@
 use std::sync::{Arc, Mutex};
 use sensor_msgs::msg::LaserScan;
 use nav_msgs::msg::OccupancyGrid;
+use nav_msgs::msg::MapMetaData;
 use std_msgs::msg::Header;
 use rclrs::Clock;
 use builtin_interfaces::msg::Time;
+use geometry_msgs::msg::Pose;
 
 struct RepublisherNode {
     node: Arc<rclrs::Node>,
@@ -40,7 +42,7 @@ impl RepublisherNode {
         })
     }
 
-    fn republish(&self, frame_id: usize) -> Result<(), rclrs::RclrsError> {
+    fn republish(&self) -> Result<(), rclrs::RclrsError> {
         if let Some(s) = &*self.data.lock().unwrap() {
             self.publisher.publish(s)?;
         }
@@ -52,19 +54,23 @@ impl RepublisherNode {
 
         let header = Header {
             stamp: Time{ nanosec, sec },
-            frame_id: frame_id.to_string(),
+            frame_id: "map".to_string(),
         };
 
-        /*
-        {
-            let mut i = self.frame_id.lock().unwrap();
-            *i += 1;
-        }*/
+        let info = MapMetaData {
+            map_load_time: Time{ nanosec: nanosec, sec: sec },
+            resolution: 0.1,
+            width: 12, 
+            height: 12, 
+            origin: Pose::default(),
+        };
 
+        let mut data = vec![100; 12*12];
+        for (i, e) in data.iter_mut().enumerate() {
+            *e = (i%128) as i8;
+        }
 
-        dbg!("{:?}", &header);
-
-        let map = OccupancyGrid::default();
+        let map = OccupancyGrid { header, info, data, };
         self.obstacle_map.publish(map)?;
 
         Ok(())
@@ -77,13 +83,10 @@ fn main() -> Result<(), rclrs::RclrsError> {
     let republisher_other_thread = Arc::clone(&republisher);
 
     std::thread::spawn(move || -> Result<(), rclrs::RclrsError> {
-        let mut frame_id = 0;
         loop {
             use std::time::Duration;
             std::thread::sleep(Duration::from_millis(1000));
-            republisher_other_thread.republish(frame_id)?;
-
-            frame_id += 1;
+            republisher_other_thread.republish()?;
         }
     });
 
